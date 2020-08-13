@@ -22,6 +22,7 @@ recovered_global = pd.read_csv(time_series_covid19_recovered_global)
 
 
 #Melt date columns and it values of each data frame
+@st.cache
 def is_date(string, fuzzy=False):
     """
     Return whether the string can be interpreted as a date.
@@ -54,10 +55,12 @@ add_selectbox = st.sidebar.selectbox(
     ('Global', 'US')
 )
 
+number_record = st.sidebar.slider('Number of record', min_value=5, max_value=500)
+
 
 if add_selectbox == 'US':
   confirmed_US_melted = pd.melt(confirmed_US,id_vars=find_indexes_columns(confirmed_US), var_name = "Date", value_name="Confirmed_cases")
-  st.write(confirmed_US_melted.head())
+  st.write(confirmed_US_melted.head(number_record))
 elif add_selectbox == 'Global':
   country_list = confirmed_global['Country/Region'].unique()
   add_country = st.sidebar.selectbox(
@@ -65,4 +68,4 @@ elif add_selectbox == 'Global':
     country_list
   )
   confirmed_global_melted = pd.melt(confirmed_global[confirmed_global['Country/Region']== add_country],id_vars=find_indexes_columns(confirmed_global), var_name = "Date", value_name="Confirmed_cases")
-  st.dataframe(confirmed_global_melted.head())
+  confirmed_global_melted.head(number_record).plot(kind='hist')
