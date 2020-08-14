@@ -14,15 +14,28 @@ time_series_covid19_deaths_US = 'https://raw.githubusercontent.com/CSSEGISandDat
 time_series_covid19_deaths_global = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv'
 time_series_covid19_recovered_global = 'https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_recovered_global.csv'
 #Create DF from csv files
-confirmed_US = pd.read_csv(time_series_covid19_confirmed_US)
-confirmed_global = pd.read_csv(time_series_covid19_confirmed_global)
-deaths_US = pd.read_csv(time_series_covid19_deaths_US)
-deaths_global = pd.read_csv(time_series_covid19_deaths_global)
-recovered_global = pd.read_csv(time_series_covid19_recovered_global)
+#confirmed_US = pd.read_csv(time_series_covid19_confirmed_US)
+#confirmed_global = pd.read_csv(time_series_covid19_confirmed_global)
+#deaths_US = pd.read_csv(time_series_covid19_deaths_US)
+#deaths_global = pd.read_csv(time_series_covid19_deaths_global)
+#recovered_global = pd.read_csv(time_series_covid19_recovered_global)
 
 
-#Melt date columns and it values of each data frame
-@st.cache
+def load_df(name):
+  if name == 'US Confirmed':
+    returned_df = pd.read_csv(time_series_covid19_confirmed_US)
+  elif name == 'Golbal Confirmed':
+    returned_df = pd.read_csv(time_series_covid19_confirmed_global)
+  elif name == 'Death US':
+    returned_df = pd.read_csv(time_series_covid19_deaths_US)
+  elif name == 'Death Global':
+    returned_df = pd.read_csv(time_series_covid19_deaths_global)
+  elif name == 'Recovered':
+    returned_df = recovered_global = pd.read_csv(time_series_covid19_recovered_global)
+  return returned_df
+
+
+
 def is_date(string, fuzzy=False):
     """
     Return whether the string can be interpreted as a date.
@@ -50,22 +63,15 @@ def find_indexes_columns (table_df):
 #recovered_global = pd.melt(recovered_global, id_vars=find_indexes_columns(recovered_global), var_name="Date", value_name="number_of_deaths")
 
 # Add a selectbox to the sidebar:
-add_selectbox = st.sidebar.selectbox(
+if run:
+  scale = st.sidebar.selectbox(
     'Global or US?',
     ('Global', 'US')
-)
-
-number_record = st.sidebar.slider('Number of record', min_value=5, max_value=500)
-
-
-if add_selectbox == 'US':
-  confirmed_US_melted = pd.melt(confirmed_US,id_vars=find_indexes_columns(confirmed_US), var_name = "Date", value_name="Confirmed_cases")
-  st.write(confirmed_US_melted.head(number_record))
-elif add_selectbox == 'Global':
-  country_list = confirmed_global['Country/Region'].unique()
-  add_country = st.sidebar.selectbox(
-    'Choose the country',
-    country_list
   )
-  confirmed_global_melted = pd.melt(confirmed_global[confirmed_global['Country/Region']== add_country],id_vars=find_indexes_columns(confirmed_global), var_name = "Date", value_name="Confirmed_cases")
-  confirmed_global_melted.head(number_record).plot(kind='hist')
+  if scale == 'US':
+    df_type = st.sidebar.selectbox(
+      'Confirmed or Death?',
+      ('Confirmed', 'Death')
+    )
+    if df_type == 'Confirmed':
+      load_df('US Confirmed')
